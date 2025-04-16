@@ -4,24 +4,25 @@ import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/biryanim/avito-tech-pvz/internal/model"
+	"github.com/google/uuid"
 )
 
-func (r *repo) Create(ctx context.Context, user *model.UserRegistration) (string, error) {
+func (r *repo) Create(ctx context.Context, user *model.UserRegistration) (uuid.UUID, error) {
+	id := uuid.New()
+
 	builder := sq.Insert(tableName).
-		Columns(emailColumnName, passwordColumnName, roleColumnName).
-		Values(user.Info.Email, user.Password, user.Info.Role).
-		Suffix("RETURNING id").
+		Columns(idColumnName, emailColumnName, passwordColumnName, roleColumnName).
+		Values(id, user.Info.Email, user.Password, user.Info.Role).
 		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
 	if err != nil {
-		return "", err
+		return uuid.Nil, err
 	}
 
-	var id string
-	err = r.pgx.QueryRow(ctx, query, args...).Scan(&id)
+	_, err = r.pgx.Exec(ctx, query, args...)
 	if err != nil {
-		return "", err
+		return uuid.Nil, err
 	}
 
 	return id, nil

@@ -3,7 +3,7 @@
 
 create table users
 (
-    id uuid primary key default gen_random_uuid(),
+    id uuid primary key,
     email varchar(255) not null unique,
     role varchar(255) not null,
     password varchar(255) not null,
