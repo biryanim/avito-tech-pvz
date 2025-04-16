@@ -17,7 +17,7 @@ func ToUserRegistrationModelFromRegistrationDTO(registerInfo dto.RegisterRequest
 
 func ToRegistrationRespFromUserModel(user *model.User) *dto.RegisterResponse {
 	return &dto.RegisterResponse{
-		ID:    user.ID,
+		ID:    user.ID.String(),
 		Email: user.Info.Email,
 		Role:  user.Info.Role,
 	}
