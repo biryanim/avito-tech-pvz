@@ -42,6 +42,7 @@ func main() {
 
 	router.POST("/login", authImpl.Login)
 	router.POST("/register", authImpl.Register)
+	router.POST("dummyLogin", authImpl.DummyLogin)
 
 	serverAddr := ":8080"
 	log.Printf("server listening on %s", serverAddr)

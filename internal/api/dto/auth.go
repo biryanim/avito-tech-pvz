@@ -20,3 +20,11 @@ type LoginRequest struct {
 type LoginResponse struct {
 	Token string `json:"token"`
 }
+
+type LoginDummyRequest struct {
+	Role string `json:"role" binding:"required"`
+}
+
+type LoginDummyResponse struct {
+	Token string `json:"token"`
+}
