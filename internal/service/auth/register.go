@@ -4,16 +4,22 @@ import (
 	"context"
 	"github.com/biryanim/avito-tech-pvz/internal/model"
 	"github.com/biryanim/avito-tech-pvz/internal/utils"
+	"github.com/pkg/errors"
 )
 
-func (s *serv) Register(ctx context.Context, registerInfo *model.UserRegistration) (*model.User, error) {
-	hashedPassword, err := utils.HashPassword(registerInfo.Password)
+func (s *serv) Register(ctx context.Context, register *model.UserRegistration) (*model.User, error) {
+	if !register.Info.Role.IsValid() {
+		//TODO: добавить кастомные ошибки для моделек
+		return nil, errors.New("invalid role")
+	}
+
+	hashedPassword, err := utils.HashPassword(register.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	registerInfo.Password = hashedPassword
-	id, err := s.userRepository.Create(ctx, registerInfo)
+	register.Password = hashedPassword
+	id, err := s.userRepository.Create(ctx, register)
 	if err != nil {
 		return nil, err
 	}
@@ -21,8 +27,8 @@ func (s *serv) Register(ctx context.Context, registerInfo *model.UserRegistratio
 	return &model.User{
 		ID: id,
 		Info: model.UserInfo{
-			Email: registerInfo.Info.Email,
-			Role:  registerInfo.Info.Role,
+			Email: register.Info.Email,
+			Role:  register.Info.Role,
 		},
 	}, nil
 }

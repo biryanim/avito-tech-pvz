@@ -7,13 +7,15 @@ import (
 )
 
 type serv struct {
-	userRepository repository.UserRepository
-	jwtConfig      config.JWTConfig
+	userRepository   repository.UserRepository
+	accessRepository repository.AccessRepository
+	jwtConfig        config.JWTConfig
 }
 
-func NewService(userRepository repository.UserRepository, jwtCfg config.JWTConfig) service.AuthService {
+func NewService(userRepository repository.UserRepository, accessRepository repository.AccessRepository, jwtCfg config.JWTConfig) service.AuthService {
 	return &serv{
-		userRepository: userRepository,
-		jwtConfig:      jwtCfg,
+		userRepository:   userRepository,
+		accessRepository: accessRepository,
+		jwtConfig:        jwtCfg,
 	}
 }

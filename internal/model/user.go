@@ -1,13 +1,13 @@
 package model
 
 import (
-	"github.com/google/uuid"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 )
 
 type UserInfo struct {
 	Email string
-	Role  string
+	Role  Role
 }
 type UserRegistration struct {
 	Info     UserInfo
@@ -27,5 +27,20 @@ type UserLoginInfo struct {
 
 type UserClaims struct {
 	jwt.StandardClaims
-	Email string
+	Role Role
+}
+
+type Role string
+
+const (
+	RoleEmployee  Role = "employee"
+	RoleModerator Role = "moderator"
+)
+
+func (r Role) IsValid() bool {
+	switch r {
+	case RoleEmployee, RoleModerator:
+		return true
+	}
+	return false
 }

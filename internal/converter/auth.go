@@ -9,7 +9,7 @@ func ToUserRegistrationModelFromRegistrationDTO(registerInfo dto.RegisterRequest
 	return &model.UserRegistration{
 		Info: model.UserInfo{
 			Email: registerInfo.Email,
-			Role:  registerInfo.Role,
+			Role:  model.Role(registerInfo.Role),
 		},
 		Password: registerInfo.Password,
 	}
@@ -19,7 +19,7 @@ func ToRegistrationRespFromUserModel(user *model.User) *dto.RegisterResponse {
 	return &dto.RegisterResponse{
 		ID:    user.ID.String(),
 		Email: user.Info.Email,
-		Role:  user.Info.Role,
+		Role:  string(user.Info.Role),
 	}
 }
 

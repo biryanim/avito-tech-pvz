@@ -17,7 +17,7 @@ func (s *serv) Login(ctx context.Context, loginInfo *model.UserLoginInfo) (strin
 		return "", errors.New("invalid password")
 	}
 
-	token, err := utils.GenerateToken(user.Info, s.jwtConfig.TokenSecret(), s.jwtConfig.TokenExpiration())
+	token, err := utils.GenerateToken(user.Info.Role, s.jwtConfig.TokenSecret(), s.jwtConfig.TokenExpiration())
 	if err != nil {
 		return "", err
 	}
