@@ -9,29 +9,28 @@ import (
 	"time"
 )
 
-func (r *repo) Create(ctx context.Context, pvz *model.Pvz) (uuid.UUID, error) {
-	if len(pvz.ID.String()) == 0 {
-		pvz.ID = uuid.New()
-	}
-
-	if pvz.RegistrationDate.IsZero() {
-		pvz.RegistrationDate = time.Now()
-	}
+func (r *repo) Create(ctx context.Context, pvzInfo *model.PVZInfo) (*model.PVZ, error) {
+	id := uuid.New()
+	createdAt := time.Now().UTC()
 
 	builder := sq.Insert(pvzTableName).
-		Columns(idColumnName, registrationDateColumnName, cityColumnName).
-		Values(pvz.ID, pvz.RegistrationDate, pvz.City).
+		Columns(idColumnName, createdAtColumnName, cityColumnName).
+		Values(id, createdAt, pvzInfo.City).
 		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
 	if err != nil {
-		return uuid.Nil, errors.Wrap(err, "failed to build query")
+		return nil, errors.Wrap(err, "failed to build query")
 	}
 
 	_, err = r.pgx.Exec(ctx, query, args...)
 	if err != nil {
-		return uuid.Nil, errors.Wrap(err, "failed to execute query")
+		return nil, errors.Wrap(err, "failed to execute query")
 	}
 
-	return pvz.ID, nil
+	return &model.PVZ{
+		ID:               id,
+		RegistrationDate: createdAt,
+		Info:             *pvzInfo,
+	}, nil
 }

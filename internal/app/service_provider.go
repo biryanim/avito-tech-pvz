@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"github.com/biryanim/avito-tech-pvz/internal/api/pvz"
 	"log"
 
 	"github.com/biryanim/avito-tech-pvz/internal/api/auth"
@@ -30,6 +31,7 @@ type serviceProvider struct {
 	pvzService  service.PVZService
 
 	authImpl *auth.Implementation
+	pvzImpl  *pvz.Implementation
 }
 
 func newServiceProvider() *serviceProvider {
@@ -144,4 +146,12 @@ func (s *serviceProvider) AuthImpl(ctx context.Context) *auth.Implementation {
 	}
 
 	return s.authImpl
+}
+
+func (s *serviceProvider) PvzImpl(ctx context.Context) *pvz.Implementation {
+	if s.pvzImpl == nil {
+		s.pvzImpl = pvz.NewImplementation(s.PvzService(ctx))
+	}
+
+	return s.pvzImpl
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/biryanim/avito-tech-pvz/internal/model"
 )
 
-func ToUserRegistrationModelFromRegistrationDTO(registerInfo dto.RegisterRequest) *model.UserRegistration {
+func ToUserRegistrationModelFromRegistrationDTO(registerInfo *dto.RegisterRequest) *model.UserRegistration {
 	return &model.UserRegistration{
 		Info: model.UserInfo{
 			Email: registerInfo.Email,

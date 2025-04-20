@@ -10,13 +10,13 @@ const (
 	receptionsTableName = "receptions"
 	productsTableName   = "products"
 
-	idColumnName               = "id"
-	registrationDateColumnName = "registration_date"
-	cityColumnName             = "city"
-	pvzIdColumnName            = "pvz_id"
-	receptionIdColumnName      = "reception_id"
-	dateTimeColumnName         = "date_time"
-	statusColumnName           = "status"
+	idColumnName          = "id"
+	cityColumnName        = "city"
+	pvzIdColumnName       = "pvz_id"
+	receptionIdColumnName = "reception_id"
+	statusColumnName      = "status"
+	typeColumnName        = "type"
+	createdAtColumnName   = "created_at"
 )
 
 type repo struct {

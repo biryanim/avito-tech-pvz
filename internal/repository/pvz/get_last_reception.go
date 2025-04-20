@@ -8,10 +8,10 @@ import (
 )
 
 func (r *repo) GetLastReception(ctx context.Context, pvzId uuid.UUID) (*model.Reception, error) {
-	builder := sq.Select(idColumnName, dateTimeColumnName, pvzIdColumnName, statusColumnName).
+	builder := sq.Select(idColumnName, createdAtColumnName, pvzIdColumnName, statusColumnName).
 		From(receptionsTableName).
 		Where(sq.Eq{pvzIdColumnName: pvzId}).
-		OrderBy(dateTimeColumnName + " DESC").
+		OrderBy(createdAtColumnName + " DESC").
 		Limit(1)
 
 	query, args, err := builder.ToSql()

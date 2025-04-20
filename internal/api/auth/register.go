@@ -12,12 +12,12 @@ import (
 func (i *Implementation) Register(ctx *gin.Context) {
 	var req dto.RegisterRequest
 
-	if err := ctx.ShouldBind(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user, err := i.authService.Register(ctx, converter.ToUserRegistrationModelFromRegistrationDTO(req))
+	user, err := i.authService.Register(ctx, converter.ToUserRegistrationModelFromRegistrationDTO(&req))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return

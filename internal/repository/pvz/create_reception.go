@@ -12,7 +12,7 @@ func (r *repo) CreateReception(ctx context.Context, pvzId uuid.UUID) (*model.Rec
 	id := uuid.New()
 	dateTime := time.Now().UTC()
 	builder := sq.Insert(receptionsTableName).
-		Columns(idColumnName, dateTimeColumnName, pvzIdColumnName, statusColumnName).
+		Columns(idColumnName, createdAtColumnName, pvzIdColumnName, statusColumnName).
 		Values(id, dateTime, pvzId, model.StatusInProgress)
 
 	query, args, err := builder.ToSql()

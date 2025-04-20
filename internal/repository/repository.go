@@ -16,10 +16,11 @@ type AccessRepository interface {
 }
 
 type PvzRepository interface {
-	Create(ctx context.Context, pvz *model.Pvz) (uuid.UUID, error)
+	Create(ctx context.Context, pvz *model.PVZInfo) (*model.PVZ, error)
 	CreateReception(ctx context.Context, pvzId uuid.UUID) (*model.Reception, error)
 	GetLastReception(ctx context.Context, pvzId uuid.UUID) (*model.Reception, error)
-	//AddProductToReception(ctx context.Context, reception *model.Reception) error
-
-	//Get(ctx context.Context, uuid uuid.UUID) (*model.Pvz, error)
+	CreateProduct(ctx context.Context, product *model.ProductInfo) (*model.Product, error)
+	DeleteLastProduct(ctx context.Context, receptionId uuid.UUID) error
+	UpdateReception(ctx context.Context, receptionId uuid.UUID) error
+	GetListPVZ(ctx context.Context, pagination *model.Filter) ([]*model.PVZWithReceptions, error)
 }

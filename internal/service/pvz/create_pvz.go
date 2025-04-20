@@ -2,9 +2,20 @@ package pvz
 
 import (
 	"context"
+
 	"github.com/biryanim/avito-tech-pvz/internal/model"
+	"github.com/pkg/errors"
 )
 
-func (s *serv) CreatePVZ(ctx context.Context, pvz *model.Pvz) (*model.Pvz, error) {
-	return nil, nil
+func (s *serv) CreatePVZ(ctx context.Context, pvzInfo *model.PVZInfo) (*model.PVZ, error) {
+	if !pvzInfo.City.IsValid() {
+		return nil, errors.New("invalid city")
+	}
+
+	pvz, err := s.pvzRepository.Create(ctx, pvzInfo)
+	if err != nil {
+		return nil, errors.Wrap(err, "create pvz")
+	}
+
+	return pvz, nil
 }

@@ -5,10 +5,14 @@ import (
 	"time"
 )
 
-type Pvz struct {
+type PVZ struct {
 	ID               uuid.UUID
+	Info             PVZInfo
 	RegistrationDate time.Time
-	City             City
+}
+
+type PVZInfo struct {
+	City City
 }
 
 type Reception struct {
@@ -18,11 +22,37 @@ type Reception struct {
 	Status   Status
 }
 
+type ProductPVZ struct {
+	Type  ProductType
+	PvzId uuid.UUID
+}
+
 type Product struct {
-	ID          uuid.UUID
-	Date        time.Time
+	ID        uuid.UUID
+	Info      ProductInfo
+	CreatedAt time.Time
+}
+
+type ProductInfo struct {
 	Type        ProductType
 	ReceptionId uuid.UUID
+}
+
+type PVZWithReceptions struct {
+	PVZ        PVZ
+	Receptions []ReceptionsWithProducts
+}
+
+type ReceptionsWithProducts struct {
+	Reception Reception
+	Products  []Product
+}
+
+type Filter struct {
+	StartDate time.Time
+	EndDate   time.Time
+	Page      uint64
+	Limit     uint64
 }
 
 type City string

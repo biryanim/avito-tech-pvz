@@ -12,7 +12,7 @@ import (
 func (i *Implementation) Login(ctx *gin.Context) {
 	var req *dto.LoginRequest
 
-	if err := ctx.ShouldBind(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

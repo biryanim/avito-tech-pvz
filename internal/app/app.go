@@ -64,14 +64,27 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 	router := gin.Default()
 
 	authMiddleware := middleware.AuthMiddleware(a.serviceProvider.AuthService(ctx))
-	api := router.Group("/api")
-	{
-		api.POST("/dummyLogin", a.serviceProvider.AuthImpl(ctx).DummyLogin)
-		api.POST("/register", a.serviceProvider.AuthImpl(ctx).Register)
-		api.POST("/login", a.serviceProvider.AuthImpl(ctx).Login)
 
-		protected := api.Group("/")
-		protected.Use(authMiddleware)
+	public := router.Group("/")
+	{
+		public.POST("/dummyLogin", a.serviceProvider.AuthImpl(ctx).DummyLogin)
+		public.POST("/register", a.serviceProvider.AuthImpl(ctx).Register)
+		public.POST("/login", a.serviceProvider.AuthImpl(ctx).Login)
+	}
+
+	protected := router.Group("/")
+	protected.Use(authMiddleware)
+	{
+		pvzGroup := protected.Group("/pvz")
+		{
+			pvzGroup.POST("", a.serviceProvider.PvzImpl(ctx).CreatePvz)
+			pvzGroup.GET("", a.serviceProvider.PvzImpl(ctx).GetPVZs)
+			pvzGroup.POST("/:pvzId/close_last_reception", a.serviceProvider.PvzImpl(ctx).CloseLastReception)
+			pvzGroup.POST("/:pvzId/delete_last_product", a.serviceProvider.PvzImpl(ctx).DeleteLastProduct)
+		}
+
+		protected.POST("/receptions", a.serviceProvider.PvzImpl(ctx).Receptions)
+		protected.POST("/products", a.serviceProvider.PvzImpl(ctx).Products)
 	}
 
 	a.httpServer = &http.Server{
