@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"github.com/biryanim/avito-tech-pvz/internal/model"
-	"github.com/biryanim/avito-tech-pvz/internal/utils"
 	"github.com/pkg/errors"
 )
 
@@ -31,7 +30,7 @@ func (s *serv) accessibleRoles(ctx context.Context) (map[string]map[model.Role]s
 }
 
 func (s *serv) Check(ctx context.Context, token, method, endpointAddress string) (bool, error) {
-	claims, err := utils.VerifyToken(token, s.jwtConfig.TokenSecret())
+	claims, err := s.verifyToken(token, s.jwtConfig.TokenSecret())
 	if err != nil {
 		return false, err
 	}

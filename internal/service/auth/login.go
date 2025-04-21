@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/biryanim/avito-tech-pvz/internal/model"
-	"github.com/biryanim/avito-tech-pvz/internal/utils"
 )
 
 func (s *serv) Login(ctx context.Context, loginInfo *model.UserLoginInfo) (string, error) {
@@ -13,11 +12,11 @@ func (s *serv) Login(ctx context.Context, loginInfo *model.UserLoginInfo) (strin
 		return "", err
 	}
 
-	if !utils.VerifyPassword(user.Password, loginInfo.Password) {
+	if !s.verifyPassword(user.Password, loginInfo.Password) {
 		return "", errors.New("invalid password")
 	}
 
-	token, err := utils.GenerateToken(user.Info.Role, s.jwtConfig.TokenSecret(), s.jwtConfig.TokenExpiration())
+	token, err := s.generateToken(user.Info.Role, s.jwtConfig.TokenSecret(), s.jwtConfig.TokenExpiration())
 	if err != nil {
 		return "", err
 	}

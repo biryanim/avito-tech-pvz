@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"github.com/biryanim/avito-tech-pvz/internal/model"
-	"github.com/biryanim/avito-tech-pvz/internal/utils"
 	"github.com/pkg/errors"
 )
 
@@ -14,7 +13,7 @@ func (s *serv) DummyLogin(ctx context.Context, role string) (string, error) {
 		//TODO: добавить кастомные ошибки для моделек
 		return "", errors.New("invalid role")
 	}
-	token, err := utils.GenerateToken(userRole, s.jwtConfig.TokenSecret(), s.jwtConfig.TokenExpiration())
+	token, err := s.generateToken(userRole, s.jwtConfig.TokenSecret(), s.jwtConfig.TokenExpiration())
 	if err != nil {
 		return "", err
 	}

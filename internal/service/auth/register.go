@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"github.com/biryanim/avito-tech-pvz/internal/model"
-	"github.com/biryanim/avito-tech-pvz/internal/utils"
 	"github.com/pkg/errors"
 )
 
@@ -13,7 +12,7 @@ func (s *serv) Register(ctx context.Context, register *model.UserRegistration) (
 		return nil, errors.New("invalid role")
 	}
 
-	hashedPassword, err := utils.HashPassword(register.Password)
+	hashedPassword, err := s.hashPassword(register.Password)
 	if err != nil {
 		return nil, err
 	}
