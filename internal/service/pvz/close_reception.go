@@ -8,19 +8,32 @@ import (
 )
 
 func (s *serv) CloseReception(ctx context.Context, pvzId uuid.UUID) (*model.Reception, error) {
-	lastReception, err := s.pvzRepository.GetLastReception(ctx, pvzId)
+	var (
+		lastReception *model.Reception
+	)
+
+	err := s.txManager.ReadCommited(ctx, func(ctx context.Context) error {
+		var err error
+		lastReception, err = s.pvzRepository.GetLastReception(ctx, pvzId)
+		if err != nil {
+			return err
+		}
+
+		if lastReception.Status == model.StatusClose {
+			return errors.New("reception is already closed")
+		}
+
+		err = s.pvzRepository.UpdateReception(ctx, lastReception.ID)
+		if err != nil {
+			return err
+		}
+		lastReception.Status = model.StatusClose
+		return nil
+	})
+
 	if err != nil {
 		return nil, err
 	}
 
-	if lastReception.Status == model.StatusClose {
-		return nil, errors.New("reception is already closed")
-	}
-
-	err = s.pvzRepository.UpdateReception(ctx, lastReception.ID)
-	if err != nil {
-		return nil, err
-	}
-	lastReception.Status = model.StatusClose
 	return lastReception, nil
 }
