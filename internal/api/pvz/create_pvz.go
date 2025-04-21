@@ -7,18 +7,28 @@ import (
 	"net/http"
 )
 
-func (i *Implementation) CreatePvz(ctx *gin.Context) {
+func (i *Implementation) CreatePvz(c *gin.Context) {
 	var req dto.PVZCreateRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Message: "invalid request",
+		})
 		return
 	}
 
-	res, err := i.pvzService.CreatePVZ(ctx, converter.ToPVZInfoFromDTO(&req))
+	pvzInfo, err := converter.ToPVZInfoFromDTO(&req)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Message: err.Error(),
+		})
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, converter.ToPVZResponseFromPVZ(res))
+	res, err := i.pvzService.CreatePVZ(c.Request.Context(), pvzInfo)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, converter.ToPVZResponseFromPVZ(res))
 }

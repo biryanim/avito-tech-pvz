@@ -8,19 +8,18 @@ import (
 
 func (s *serv) Register(ctx context.Context, register *model.UserRegistration) (*model.User, error) {
 	if !register.Info.Role.IsValid() {
-		//TODO: добавить кастомные ошибки для моделек
-		return nil, errors.New("invalid role")
+		return nil, model.ErrorInvalidRole
 	}
 
 	hashedPassword, err := s.hashPassword(register.Password)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to hash password")
 	}
 
 	register.Password = hashedPassword
 	id, err := s.userRepository.Create(ctx, register)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create user")
 	}
 
 	return &model.User{

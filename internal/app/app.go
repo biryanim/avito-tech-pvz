@@ -4,7 +4,9 @@ import (
 	"context"
 	"github.com/biryanim/avito-tech-pvz/internal/api/middleware"
 	"github.com/biryanim/avito-tech-pvz/internal/config"
+	"github.com/biryanim/avito-tech-pvz/pkg/logger"
 	"github.com/gin-gonic/gin"
+	"io"
 	"log"
 	"net/http"
 )
@@ -40,6 +42,7 @@ func (a *App) initDeps(ctx context.Context) error {
 		a.initConfig,
 		a.initServiceProvider,
 		a.initHTTPServer,
+		a.initLogger,
 	}
 
 	for _, f := range inits {
@@ -60,10 +63,24 @@ func (a *App) initConfig(_ context.Context) error {
 	return nil
 }
 
+func (a *App) initLogger(_ context.Context) error {
+	logger.Init(a.serviceProvider.LoggerConfig().GetCore())
+	return nil
+}
+
 func (a *App) initHTTPServer(ctx context.Context) error {
-	router := gin.Default()
+	//gin.SetMode(gin.ReleaseMode)
+	//gin.DisableConsoleColor()
+	gin.SetMode(gin.ReleaseMode)
+	gin.DefaultWriter = io.Discard // Перенаправляем логи в никуда
+	gin.DefaultErrorWriter = io.Discard
+
+	router := gin.New()
 
 	authMiddleware := middleware.AuthMiddleware(a.serviceProvider.AuthService(ctx))
+
+	router.Use(gin.Recovery())
+	router.Use(middleware.LogMiddleware())
 
 	public := router.Group("/")
 	{

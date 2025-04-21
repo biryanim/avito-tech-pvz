@@ -20,9 +20,10 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig   config.PGConfig
-	jwtConfig  config.JWTConfig
-	httpConfig config.HTTPConfig
+	pgConfig     config.PGConfig
+	jwtConfig    config.JWTConfig
+	httpConfig   config.HTTPConfig
+	loggerConfig config.LoggerConfig
 
 	dbClient         db.Client
 	txManager        db.TxManager
@@ -78,6 +79,19 @@ func (s *serviceProvider) HTTPConfig() config.HTTPConfig {
 	}
 
 	return s.httpConfig
+}
+
+func (s *serviceProvider) LoggerConfig() config.LoggerConfig {
+	if s.loggerConfig == nil {
+		cfg, err := config.NewLoggerConfig()
+		if err != nil {
+			log.Fatalf("failed to load logger config: %v", err)
+		}
+
+		s.loggerConfig = cfg
+	}
+
+	return s.loggerConfig
 }
 
 func (s *serviceProvider) DBClient(ctx context.Context) db.Client {

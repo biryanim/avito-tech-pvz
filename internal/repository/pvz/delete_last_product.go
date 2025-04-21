@@ -2,6 +2,7 @@ package pvz
 
 import (
 	"context"
+	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
 )
@@ -27,9 +28,12 @@ func (r *repo) DeleteLastProduct(ctx context.Context, receptionId uuid.UUID) err
 		return err
 	}
 
-	_, err = r.db.DB().ExecContext(ctx, query, args...)
+	tag, err := r.db.DB().ExecContext(ctx, query, args...)
 	if err != nil {
 		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return sql.ErrNoRows
 	}
 	return nil
 }

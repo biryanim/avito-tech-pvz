@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/biryanim/avito-tech-pvz/internal/model"
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 )
 
 func (s *serv) CloseReception(ctx context.Context, pvzId uuid.UUID) (*model.Reception, error) {
@@ -20,7 +19,7 @@ func (s *serv) CloseReception(ctx context.Context, pvzId uuid.UUID) (*model.Rece
 		}
 
 		if lastReception.Status == model.StatusClose {
-			return errors.New("reception is already closed")
+			return model.ErrNoOpenReceptions
 		}
 
 		err = s.pvzRepository.UpdateReception(ctx, lastReception.ID)

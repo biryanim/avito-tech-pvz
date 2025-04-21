@@ -1,29 +1,32 @@
 package auth
 
 import (
-	"fmt"
 	"github.com/biryanim/avito-tech-pvz/internal/api/dto"
+	"github.com/biryanim/avito-tech-pvz/internal/converter"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func (i *Implementation) DummyLogin(ctx *gin.Context) {
+func (i *Implementation) DummyLogin(c *gin.Context) {
 	var req dto.LoginDummyRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Message: "invalid request"})
 		return
 	}
 
-	fmt.Println("1111111111111111111111")
-
-	token, err := i.authService.DummyLogin(ctx, req.Role)
-	fmt.Println("22222222222222222222")
+	mod, err := converter.ToRoleModel(req.Role)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Message: err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &dto.LoginResponse{
+	token, err := i.authService.DummyLogin(c.Request.Context(), mod)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, &dto.LoginResponse{
 		Token: token,
 	})
 }

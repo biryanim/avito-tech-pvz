@@ -9,10 +9,13 @@ import (
 	"time"
 )
 
-func ToPVZInfoFromDTO(pvzCreateDTO *dto.PVZCreateRequest) *model.PVZInfo {
-	return &model.PVZInfo{
-		City: model.City(pvzCreateDTO.City),
+func ToPVZInfoFromDTO(pvzCreateDTO *dto.PVZCreateRequest) (*model.PVZInfo, error) {
+	var mod model.PVZInfo
+	mod.City = model.City(pvzCreateDTO.City)
+	if !mod.City.IsValid() {
+		return nil, errors.New("invalid city")
 	}
+	return &mod, nil
 }
 
 func ToPVZResponseFromPVZ(pvz *model.PVZ) *dto.PVZResponse {
@@ -31,14 +34,14 @@ func ToPaginationFilterFromPaginationRequest(pag *dto.PaginationRequest) (*model
 	if len(pag.StartDate) != 0 {
 		filter.StartDate, err = time.Parse(time.RFC3339, pag.StartDate)
 		if err != nil {
-			return nil, err
+			return nil, errors.New("invalid date format")
 		}
 	}
 
 	if len(pag.EndDate) != 0 {
 		filter.EndDate, err = time.Parse(time.RFC3339, pag.EndDate)
 		if err != nil {
-			return nil, err
+			return nil, errors.New("invalid date format")
 		}
 	}
 

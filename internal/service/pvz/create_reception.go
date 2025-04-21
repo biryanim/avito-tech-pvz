@@ -4,11 +4,9 @@ import (
 	"context"
 	"github.com/biryanim/avito-tech-pvz/internal/model"
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 )
 
 func (s *serv) CreateReception(ctx context.Context, pvzId uuid.UUID) (*model.Reception, error) {
-
 	var (
 		lastReception *model.Reception
 		newReception  *model.Reception
@@ -21,7 +19,7 @@ func (s *serv) CreateReception(ctx context.Context, pvzId uuid.UUID) (*model.Rec
 		}
 
 		if lastReception != nil && lastReception.Status != model.StatusClose {
-			return errors.New("last reception is not closed")
+			return model.ErrLastReceptionNotClosed
 		}
 
 		newReception, err = s.pvzRepository.CreateReception(ctx, pvzId)

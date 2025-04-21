@@ -2,7 +2,15 @@ package model
 
 import (
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"time"
+)
+
+var (
+	ErrNoOpenReceptions       = errors.New("no open receptions")
+	ErrNoProducts             = errors.New("no products")
+	ErrNoSuchPvz              = errors.New("no such pvz")
+	ErrLastReceptionNotClosed = errors.New("last reception not closed")
 )
 
 type PVZ struct {

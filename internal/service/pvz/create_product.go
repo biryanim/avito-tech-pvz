@@ -25,7 +25,7 @@ func (s *serv) AddProductToReception(ctx context.Context, productPVZ *model.Prod
 		}
 
 		if lastReception.Status != model.StatusInProgress {
-			return errors.New("reception is already closed")
+			return model.ErrNoOpenReceptions
 		}
 
 		productInfo := &model.ProductInfo{

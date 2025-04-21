@@ -3,6 +3,14 @@ package model
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
+)
+
+var (
+	ErrorInvalidToken    = errors.New("invalid token")
+	ErrorInvalidRole     = errors.New("invalid role")
+	ErrorInvalidPassword = errors.New("invalid password")
+	ErrorUserNotFound    = errors.New("user not found")
 )
 
 type UserInfo struct {

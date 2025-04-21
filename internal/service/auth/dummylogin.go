@@ -6,16 +6,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s *serv) DummyLogin(ctx context.Context, role string) (string, error) {
-
-	userRole := model.Role(role)
-	if !userRole.IsValid() {
-		//TODO: добавить кастомные ошибки для моделек
-		return "", errors.New("invalid role")
-	}
-	token, err := s.generateToken(userRole, s.jwtConfig.TokenSecret(), s.jwtConfig.TokenExpiration())
+func (s *serv) DummyLogin(ctx context.Context, role model.Role) (string, error) {
+	token, err := s.generateToken(role, s.jwtConfig.TokenSecret(), s.jwtConfig.TokenExpiration())
 	if err != nil {
-		return "", err
+		return "", errors.New("failed to generate token")
 	}
 	return token, nil
 }

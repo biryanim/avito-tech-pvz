@@ -9,19 +9,19 @@ import (
 
 //TODO: добавить middleware для правильного возвращения ошибок с кодом и сообщением + возвращать модельки
 
-func (i *Implementation) Register(ctx *gin.Context) {
+func (i *Implementation) Register(c *gin.Context) {
 	var req dto.RegisterRequest
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Message: "invalid request"})
 		return
 	}
 
-	user, err := i.authService.Register(ctx, converter.ToUserRegistrationModelFromRegistrationDTO(&req))
+	user, err := i.authService.Register(c.Request.Context(), converter.ToUserRegistrationModelFromRegistrationDTO(&req))
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Message: "internal server error"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, converter.ToRegistrationRespFromUserModel(user))
+	c.JSON(http.StatusCreated, converter.ToRegistrationRespFromUserModel(user))
 }

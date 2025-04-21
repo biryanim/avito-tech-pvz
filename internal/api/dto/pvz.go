@@ -1,7 +1,7 @@
 package dto
 
 type PVZCreateRequest struct {
-	City string `json:"city" required:"true"`
+	City string `json:"city" binding:"required"`
 }
 
 type PVZResponse struct {
@@ -32,8 +32,8 @@ type CloseReceptionResponse struct {
 }
 
 type ProductCreateRequest struct {
-	Type  string `json:"type" required:"true"`
-	PvzID string `json:"pvzId" required:"true"`
+	Type  string `json:"type" binding:"required"`
+	PvzID string `json:"pvzId" binding:"required"`
 }
 
 type ProductResponse struct {
@@ -51,5 +51,5 @@ type PaginationRequest struct {
 }
 
 type ReceptionsRequest struct {
-	PvzID string `json:"pvzId"`
+	PvzID string `json:"pvzId" binding:"required"`
 }

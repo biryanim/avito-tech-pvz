@@ -1,8 +1,8 @@
 package dto
 
 type RegisterRequest struct {
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=8"`
 	Role     string `json:"role" binding:"required"`
 }
 
@@ -23,8 +23,4 @@ type LoginResponse struct {
 
 type LoginDummyRequest struct {
 	Role string `json:"role" binding:"required"`
-}
-
-type LoginDummyResponse struct {
-	Token string `json:"token"`
 }
