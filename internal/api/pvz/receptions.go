@@ -21,6 +21,7 @@ func (i *Implementation) Receptions(ctx *gin.Context) {
 	resp, err := i.pvzService.CreateReception(ctx, pvzId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	ctx.JSON(http.StatusOK, converter.ToReceptionResponse(resp))
 }

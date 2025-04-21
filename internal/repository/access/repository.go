@@ -1,8 +1,8 @@
 package access
 
 import (
+	"github.com/biryanim/avito-tech-pvz/internal/client/db"
 	"github.com/biryanim/avito-tech-pvz/internal/repository"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 const (
@@ -14,11 +14,11 @@ const (
 )
 
 type repo struct {
-	pgx *pgxpool.Pool
+	db db.Client
 }
 
-func NewRepository(pgxPool *pgxpool.Pool) repository.AccessRepository {
+func NewRepository(db db.Client) repository.AccessRepository {
 	return &repo{
-		pgx: pgxPool,
+		db: db,
 	}
 }

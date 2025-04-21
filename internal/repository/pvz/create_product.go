@@ -21,7 +21,7 @@ func (r *repo) CreateProduct(ctx context.Context, product *model.ProductInfo) (*
 		return nil, err
 	}
 
-	_, err = r.pgx.Exec(ctx, query, args...)
+	_, err = r.db.DB().ExecContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}

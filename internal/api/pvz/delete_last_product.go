@@ -1,21 +1,15 @@
 package pvz
 
 import (
-	"github.com/biryanim/avito-tech-pvz/internal/api/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
 )
 
 func (i *Implementation) DeleteLastProduct(ctx *gin.Context) {
-	var req dto.DeleteProductRequest
+	pvzIdStr := ctx.Param("pvzId")
 
-	if err := ctx.ShouldBindUri(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	pvzId, err := uuid.Parse(req.PvzID)
+	pvzId, err := uuid.Parse(pvzIdStr)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -24,6 +18,7 @@ func (i *Implementation) DeleteLastProduct(ctx *gin.Context) {
 	err = i.pvzService.DeleteLastProductInReception(ctx, pvzId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Товар удален"})

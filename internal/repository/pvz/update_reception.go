@@ -10,7 +10,7 @@ import (
 func (r *repo) UpdateReception(ctx context.Context, receptionId uuid.UUID) error {
 	builder := sq.Update(receptionsTableName).
 		Set(statusColumnName, model.StatusClose).
-		Where(sq.Eq{receptionIdColumnName: receptionId}).
+		Where(sq.Eq{idColumnName: receptionId}).
 		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
@@ -18,7 +18,7 @@ func (r *repo) UpdateReception(ctx context.Context, receptionId uuid.UUID) error
 		return err
 	}
 
-	_, err = r.pgx.Exec(ctx, query, args...)
+	_, err = r.db.DB().ExecContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}

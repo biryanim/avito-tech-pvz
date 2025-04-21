@@ -1,8 +1,8 @@
 package pvz
 
 import (
+	"github.com/biryanim/avito-tech-pvz/internal/client/db"
 	"github.com/biryanim/avito-tech-pvz/internal/repository"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 const (
@@ -20,11 +20,11 @@ const (
 )
 
 type repo struct {
-	pgx *pgxpool.Pool
+	db db.Client
 }
 
-func NewRepository(pgx *pgxpool.Pool) repository.PvzRepository {
+func NewRepository(db db.Client) repository.PvzRepository {
 	return &repo{
-		pgx: pgx,
+		db: db,
 	}
 }

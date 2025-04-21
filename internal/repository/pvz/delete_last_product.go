@@ -7,17 +7,27 @@ import (
 )
 
 func (r *repo) DeleteLastProduct(ctx context.Context, receptionId uuid.UUID) error {
-	builder := sq.Delete("products").
+	subquery := sq.Select(idColumnName).
+		From(productsTableName).
 		Where(sq.Eq{receptionIdColumnName: receptionId}).
 		OrderBy(createdAtColumnName + " DESC").
-		Limit(1)
+		Limit(1).PlaceholderFormat(sq.Dollar)
+
+	subSql, subArgs, err := subquery.ToSql()
+	if err != nil {
+		return err
+	}
+
+	builder := sq.Delete(productsTableName).
+		Where(idColumnName+" = ("+subSql+")", subArgs...).
+		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
 	if err != nil {
 		return err
 	}
 
-	_, err = r.pgx.Exec(ctx, query, args...)
+	_, err = r.db.DB().ExecContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}

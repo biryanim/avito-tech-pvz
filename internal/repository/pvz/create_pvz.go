@@ -23,7 +23,7 @@ func (r *repo) Create(ctx context.Context, pvzInfo *model.PVZInfo) (*model.PVZ, 
 		return nil, errors.Wrap(err, "failed to build query")
 	}
 
-	_, err = r.pgx.Exec(ctx, query, args...)
+	_, err = r.db.DB().ExecContext(ctx, query, args...)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to execute query")
 	}

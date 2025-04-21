@@ -1,8 +1,8 @@
 package user
 
 import (
+	"github.com/biryanim/avito-tech-pvz/internal/client/db"
 	"github.com/biryanim/avito-tech-pvz/internal/repository"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 const (
@@ -15,11 +15,11 @@ const (
 )
 
 type repo struct {
-	pgx *pgxpool.Pool
+	db db.Client
 }
 
-func NewRepository(pgxPool *pgxpool.Pool) repository.UserRepository {
+func NewRepository(db db.Client) repository.UserRepository {
 	return &repo{
-		pgx: pgxPool,
+		db: db,
 	}
 }

@@ -16,10 +16,10 @@ type PVZInfo struct {
 }
 
 type Reception struct {
-	ID       uuid.UUID
-	DateTime time.Time
-	PvzId    uuid.UUID
-	Status   Status
+	ID        uuid.UUID
+	CreatedAt time.Time
+	PvzId     uuid.UUID
+	Status    Status
 }
 
 type ProductPVZ struct {
@@ -51,7 +51,7 @@ type ReceptionsWithProducts struct {
 type Filter struct {
 	StartDate time.Time
 	EndDate   time.Time
-	Page      uint64
+	Offset    uint64
 	Limit     uint64
 }
 

@@ -3,6 +3,9 @@ package app
 import (
 	"context"
 	"github.com/biryanim/avito-tech-pvz/internal/api/pvz"
+	"github.com/biryanim/avito-tech-pvz/internal/client/db"
+	"github.com/biryanim/avito-tech-pvz/internal/client/db/pg"
+	"github.com/biryanim/avito-tech-pvz/internal/client/db/transaction"
 	"log"
 
 	"github.com/biryanim/avito-tech-pvz/internal/api/auth"
@@ -14,7 +17,6 @@ import (
 	"github.com/biryanim/avito-tech-pvz/internal/service"
 	authService "github.com/biryanim/avito-tech-pvz/internal/service/auth"
 	pvzService "github.com/biryanim/avito-tech-pvz/internal/service/pvz"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type serviceProvider struct {
@@ -22,7 +24,8 @@ type serviceProvider struct {
 	jwtConfig  config.JWTConfig
 	httpConfig config.HTTPConfig
 
-	pool             *pgxpool.Pool
+	dbClient         db.Client
+	txManager        db.TxManager
 	userRepository   repository.UserRepository
 	pvzRepository    repository.PvzRepository
 	accessRepository repository.AccessRepository
@@ -77,28 +80,35 @@ func (s *serviceProvider) HTTPConfig() config.HTTPConfig {
 	return s.httpConfig
 }
 
-func (s *serviceProvider) Pool(ctx context.Context) *pgxpool.Pool {
-	if s.pool == nil {
-		conn, err := pgxpool.New(ctx, s.PGConfig().DSN())
+func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
+	if s.dbClient == nil {
+		cl, err := pg.New(ctx, s.PGConfig().DSN())
 		if err != nil {
-			log.Fatalf("failed to connect to database: %v", err)
+			log.Fatalf("failed to create db client: %v", err)
 		}
 
-		err = conn.Ping(ctx)
+		err = cl.DB().Ping(ctx)
 		if err != nil {
-			log.Fatalf("failed to ping database: %v", err)
+			log.Fatalf("failed to ping db: %v", err)
 		}
-		//TODO: добавить Closer
-		//closer.Add(conn.Close)
-		s.pool = conn
+
+		s.dbClient = cl
 	}
 
-	return s.pool
+	return s.dbClient
+}
+
+func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
+	if s.txManager == nil {
+		s.txManager = transaction.NewTransactionManager(s.DBClient(ctx).DB())
+	}
+
+	return s.txManager
 }
 
 func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRepository {
 	if s.userRepository == nil {
-		s.userRepository = userRepository.NewRepository(s.Pool(ctx))
+		s.userRepository = userRepository.NewRepository(s.DBClient(ctx))
 	}
 
 	return s.userRepository
@@ -106,7 +116,7 @@ func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRep
 
 func (s *serviceProvider) PvzRepository(ctx context.Context) repository.PvzRepository {
 	if s.pvzRepository == nil {
-		s.pvzRepository = pvzRepository.NewRepository(s.Pool(ctx))
+		s.pvzRepository = pvzRepository.NewRepository(s.DBClient(ctx))
 	}
 
 	return s.pvzRepository
@@ -114,7 +124,7 @@ func (s *serviceProvider) PvzRepository(ctx context.Context) repository.PvzRepos
 
 func (s *serviceProvider) AccessRepository(ctx context.Context) repository.AccessRepository {
 	if s.accessRepository == nil {
-		s.accessRepository = accessRepository.NewRepository(s.Pool(ctx))
+		s.accessRepository = accessRepository.NewRepository(s.DBClient(ctx))
 	}
 
 	return s.accessRepository
@@ -134,7 +144,7 @@ func (s *serviceProvider) AuthService(ctx context.Context) service.AuthService {
 
 func (s *serviceProvider) PvzService(ctx context.Context) service.PVZService {
 	if s.pvzService == nil {
-		s.pvzService = pvzService.NewService(s.PvzRepository(ctx))
+		s.pvzService = pvzService.NewService(s.PvzRepository(ctx), s.TxManager(ctx))
 	}
 
 	return s.pvzService

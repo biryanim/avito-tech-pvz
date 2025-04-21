@@ -16,7 +16,7 @@ func (r *repo) GetList(ctx context.Context) ([]*model.AccessInfo, error) {
 		return nil, err
 	}
 
-	rows, err := r.pgx.Query(ctx, query, args...)
+	rows, err := r.db.DB().QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}

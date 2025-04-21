@@ -19,7 +19,7 @@ func (r *repo) Get(ctx context.Context, email string) (*model.User, error) {
 	}
 
 	var user model.User
-	err = r.pgx.QueryRow(ctx, query, args...).Scan(&user.ID, &user.Info.Email, &user.Password, &user.Info.Role)
+	err = r.db.DB().QueryRowContext(ctx, query, args...).Scan(&user.ID, &user.Info.Email, &user.Password, &user.Info.Role)
 	if err != nil {
 		return nil, err
 	}

@@ -2,9 +2,11 @@ package pvz
 
 import (
 	"context"
+	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/biryanim/avito-tech-pvz/internal/model"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 func (r *repo) GetLastReception(ctx context.Context, pvzId uuid.UUID) (*model.Reception, error) {
@@ -12,7 +14,8 @@ func (r *repo) GetLastReception(ctx context.Context, pvzId uuid.UUID) (*model.Re
 		From(receptionsTableName).
 		Where(sq.Eq{pvzIdColumnName: pvzId}).
 		OrderBy(createdAtColumnName + " DESC").
-		Limit(1)
+		Limit(1).
+		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
 	if err != nil {
@@ -20,7 +23,11 @@ func (r *repo) GetLastReception(ctx context.Context, pvzId uuid.UUID) (*model.Re
 	}
 
 	var rec model.Reception
-	err = r.pgx.QueryRow(ctx, query, args...).Scan(&rec.ID, &rec.DateTime, &rec.PvzId, &rec.Status)
+	err = r.db.DB().QueryRowContext(ctx, query, args...).Scan(&rec.ID, &rec.CreatedAt, &rec.PvzId, &rec.Status)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}

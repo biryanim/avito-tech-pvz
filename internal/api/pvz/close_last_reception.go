@@ -1,7 +1,6 @@
 package pvz
 
 import (
-	"github.com/biryanim/avito-tech-pvz/internal/api/dto"
 	"github.com/biryanim/avito-tech-pvz/internal/converter"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -9,13 +8,9 @@ import (
 )
 
 func (i *Implementation) CloseLastReception(ctx *gin.Context) {
-	var req dto.CloseReceptionRequest
-	if err := ctx.ShouldBindUri(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	pvzIdStr := ctx.Param("pvzId")
 
-	pvzId, err := uuid.Parse(req.PvzID)
+	pvzId, err := uuid.Parse(pvzIdStr)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

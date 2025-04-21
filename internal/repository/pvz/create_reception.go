@@ -13,22 +13,22 @@ func (r *repo) CreateReception(ctx context.Context, pvzId uuid.UUID) (*model.Rec
 	dateTime := time.Now().UTC()
 	builder := sq.Insert(receptionsTableName).
 		Columns(idColumnName, createdAtColumnName, pvzIdColumnName, statusColumnName).
-		Values(id, dateTime, pvzId, model.StatusInProgress)
+		Values(id, dateTime, pvzId, model.StatusInProgress).PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = r.pgx.Exec(ctx, query, args...)
+	_, err = r.db.DB().ExecContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 
 	return &model.Reception{
-		ID:       id,
-		PvzId:    pvzId,
-		Status:   model.StatusInProgress,
-		DateTime: dateTime,
+		ID:        id,
+		PvzId:     pvzId,
+		Status:    model.StatusInProgress,
+		CreatedAt: dateTime,
 	}, nil
 }

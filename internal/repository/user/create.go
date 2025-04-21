@@ -20,7 +20,7 @@ func (r *repo) Create(ctx context.Context, user *model.UserRegistration) (uuid.U
 		return uuid.Nil, err
 	}
 
-	_, err = r.pgx.Exec(ctx, query, args...)
+	_, err = r.db.DB().ExecContext(ctx, query, args...)
 	if err != nil {
 		return uuid.Nil, err
 	}

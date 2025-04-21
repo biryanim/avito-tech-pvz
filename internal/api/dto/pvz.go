@@ -27,10 +27,6 @@ type ReceptionResponse struct {
 	Status   string `json:"status"`
 }
 
-type CloseReceptionRequest struct {
-	PvzID string `json:"pvzId"`
-}
-
 type CloseReceptionResponse struct {
 	Reception ReceptionResponse `json:"reception"`
 }
@@ -45,13 +41,6 @@ type ProductResponse struct {
 	DateTime    string `json:"dateTime"`
 	Type        string `json:"type"`
 	ReceptionID string `json:"receptionId"`
-}
-
-type DeleteProductRequest struct {
-	PvzID string `json:"pvzId"`
-}
-type DeleteProductResponse struct {
-	DeletedProductID string `json:"deletedProductId"`
 }
 
 type PaginationRequest struct {

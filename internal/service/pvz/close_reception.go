@@ -13,7 +13,7 @@ func (s *serv) CloseReception(ctx context.Context, pvzId uuid.UUID) (*model.Rece
 		return nil, err
 	}
 
-	if lastReception.Status != model.StatusClose {
+	if lastReception.Status == model.StatusClose {
 		return nil, errors.New("reception is already closed")
 	}
 

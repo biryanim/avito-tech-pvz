@@ -4,6 +4,7 @@ import (
 	"github.com/biryanim/avito-tech-pvz/internal/api/dto"
 	"github.com/biryanim/avito-tech-pvz/internal/model"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"strconv"
 	"time"
 )
@@ -46,14 +47,28 @@ func ToPaginationFilterFromPaginationRequest(pag *dto.PaginationRequest) (*model
 		if err != nil {
 			return nil, err
 		}
+
+		if filter.Limit > 30 || filter.Limit < 1 {
+			return nil, errors.New("limit must be between 1 and 30")
+		}
+	} else {
+		filter.Limit = 10
 	}
 
+	var page uint64
 	if len(pag.Page) != 0 {
-		filter.Page, err = strconv.ParseUint(pag.Page, 10, 64)
+		page, err = strconv.ParseUint(pag.Page, 10, 64)
 		if err != nil {
 			return nil, err
 		}
+		if page < 1 {
+			return nil, errors.New("page must be greater or equal than 1")
+		}
+	} else {
+		page = 1
 	}
+
+	filter.Offset = (page - 1) * filter.Limit
 	return &filter, nil
 }
 
@@ -99,7 +114,7 @@ func ToReceptionResponse(rec *model.Reception) *dto.ReceptionResponse {
 	return &dto.ReceptionResponse{
 		ID:       rec.ID.String(),
 		PvzID:    rec.PvzId.String(),
-		DateTime: rec.DateTime.String(),
+		DateTime: rec.CreatedAt.String(),
 		Status:   string(rec.Status),
 	}
 }

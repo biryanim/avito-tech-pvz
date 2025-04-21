@@ -15,21 +15,21 @@ func (r *repo) GetListPVZ(ctx context.Context, pagination *model.Filter) ([]*mod
 		receptionsTableName+"."+idColumnName,
 		receptionsTableName+"."+pvzIdColumnName,
 		receptionsTableName+"."+statusColumnName,
-		receptionIdColumnName+"."+createdAtColumnName,
+		receptionsTableName+"."+createdAtColumnName,
 		productsTableName+"."+idColumnName,
 		productsTableName+"."+receptionIdColumnName,
 		productsTableName+"."+typeColumnName,
 		productsTableName+"."+createdAtColumnName,
 	).From(pvzTableName).
-		LeftJoin(receptionsTableName+"ON"+pvzTableName+"."+idColumnName+"="+receptionsTableName+"."+pvzIdColumnName).
-		LeftJoin(productsTableName+"ON"+receptionsTableName+"."+idColumnName+"="+productsTableName+"."+receptionIdColumnName).
+		LeftJoin(receptionsTableName+" ON "+pvzTableName+"."+idColumnName+"="+receptionsTableName+"."+pvzIdColumnName).
+		LeftJoin(productsTableName+" ON "+receptionsTableName+"."+idColumnName+"="+productsTableName+"."+receptionIdColumnName).
 		OrderBy(
 			pvzTableName+"."+createdAtColumnName,
 			receptionsTableName+"."+createdAtColumnName+" DESC",
 			productsTableName+"."+createdAtColumnName+" DESC",
 		).
 		Limit(pagination.Limit).
-		Offset((pagination.Page - 1) * pagination.Limit)
+		Offset(pagination.Offset).PlaceholderFormat(sq.Dollar)
 
 	if !pagination.StartDate.IsZero() {
 		builder = builder.Where(sq.GtOrEq{receptionsTableName + "." + createdAtColumnName: pagination.StartDate})
@@ -43,7 +43,7 @@ func (r *repo) GetListPVZ(ctx context.Context, pagination *model.Filter) ([]*mod
 		return nil, err
 	}
 
-	rows, err := r.pgx.Query(ctx, query, args...)
+	rows, err := r.db.DB().QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (r *repo) GetListPVZ(ctx context.Context, pagination *model.Filter) ([]*mod
 
 		err = rows.Scan(
 			&pvz.ID, &pvz.Info.City, &pvz.RegistrationDate,
-			&reception.ID, &reception.PvzId, &reception.Status, &reception.DateTime,
+			&reception.ID, &reception.PvzId, &reception.Status, &reception.CreatedAt,
 			&product.ID, &product.Info.ReceptionId, &product.Info.Type, &product.CreatedAt)
 		if err != nil {
 			return nil, err

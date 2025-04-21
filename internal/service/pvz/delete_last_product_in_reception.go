@@ -8,18 +8,30 @@ import (
 )
 
 func (s *serv) DeleteLastProductInReception(ctx context.Context, pvzId uuid.UUID) error {
-	lastReception, err := s.pvzRepository.GetLastReception(ctx, pvzId)
+
+	err := s.txManager.ReadCommited(ctx, func(ctx context.Context) error {
+		lastReception, err := s.pvzRepository.GetLastReception(ctx, pvzId)
+		if lastReception == nil {
+			return errors.New("no such pvz")
+		}
+		if err != nil {
+			return err
+		}
+
+		if lastReception.Status != model.StatusInProgress {
+			return errors.New("reception is already closed")
+		}
+
+		err = s.pvzRepository.DeleteLastProduct(ctx, lastReception.ID)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
 
-	if lastReception.Status != model.StatusInProgress {
-		return errors.New("reception is already closed")
-	}
-
-	err = s.pvzRepository.DeleteLastProduct(ctx, lastReception.ID)
-	if err != nil {
-		return err
-	}
 	return nil
 }

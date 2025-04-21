@@ -11,21 +11,36 @@ func (s *serv) AddProductToReception(ctx context.Context, productPVZ *model.Prod
 		// TODO: добавить кастомные ошибки при валидации полей бизнес моделек
 		return nil, errors.New("invalid product type")
 	}
-	lastReception, err := s.pvzRepository.GetLastReception(ctx, productPVZ.PvzId)
-	if err != nil {
-		return nil, err
-	}
 
-	if lastReception.Status != model.StatusInProgress {
-		return nil, errors.New("reception is already closed")
-	}
+	var (
+		lastReception *model.Reception
+		product       *model.Product
+	)
 
-	productInfo := &model.ProductInfo{
-		Type:        productPVZ.Type,
-		ReceptionId: lastReception.ID,
-	}
+	err := s.txManager.ReadCommited(ctx, func(ctx context.Context) error {
+		var err error
+		lastReception, err = s.pvzRepository.GetLastReception(ctx, productPVZ.PvzId)
+		if err != nil {
+			return err
+		}
 
-	product, err := s.pvzRepository.CreateProduct(ctx, productInfo)
+		if lastReception.Status != model.StatusInProgress {
+			return errors.New("reception is already closed")
+		}
+
+		productInfo := &model.ProductInfo{
+			Type:        productPVZ.Type,
+			ReceptionId: lastReception.ID,
+		}
+
+		product, err = s.pvzRepository.CreateProduct(ctx, productInfo)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return nil, err
 	}
